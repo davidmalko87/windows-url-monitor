@@ -70,18 +70,18 @@ param (
 # Helpers
 # ---------------------------------------------------------------------------
 
-function Write-Log {
+function Write-MonitorLog {
     param([string]$Message, [ValidateSet('INFO','WARN','ERROR')][string]$Level = 'INFO')
     $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
     $line = "[$timestamp] [$Level] $Message"
     Write-Output $line
-    Add-Content -Path $LogFile -Value $line
+    Add-Content -Path $script:LogFile -Value $line
 }
 
 function Assert-Required {
     param([string]$Value, [string]$Name)
     if (-not $Value) {
-        Write-Log "Required parameter '$Name' is not set. Set the corresponding environment variable or pass it as a parameter." -Level ERROR
+        Write-MonitorLog "Required parameter '$Name' is not set. Set the corresponding environment variable or pass it as a parameter." -Level ERROR
         exit 1
     }
 }
@@ -98,19 +98,19 @@ Assert-Required $RecipientEmail 'RecipientEmail (MONITOR_RECIPIENT_EMAIL)'
 # Check connectivity
 # ---------------------------------------------------------------------------
 
-Write-Log "Checking connectivity to '$Url'..."
+Write-MonitorLog "Checking connectivity to '$Url'..."
 
 $isReachable = $false
 try {
     $result = Test-NetConnection -ComputerName $Url -InformationLevel Quiet -ErrorAction Stop
     $isReachable = [bool]$result
 } catch {
-    Write-Log "Test-NetConnection threw an exception: $_" -Level WARN
+    Write-MonitorLog "Test-NetConnection threw an exception: $_" -Level WARN
     $isReachable = $false
 }
 
 if ($isReachable) {
-    Write-Log "'$Url' is accessible. No action needed."
+    Write-MonitorLog "'$Url' is accessible. No action needed."
     exit 0
 }
 
@@ -118,7 +118,7 @@ if ($isReachable) {
 # Site is down — send alert email
 # ---------------------------------------------------------------------------
 
-Write-Log "'$Url' is NOT accessible. Sending alert email to '$RecipientEmail'..." -Level WARN
+Write-MonitorLog "'$Url' is NOT accessible. Sending alert email to '$RecipientEmail'..." -Level WARN
 
 $subject = "ALERT: $Url is unreachable"
 $body    = @"
@@ -144,8 +144,8 @@ try {
     }
 
     $smtp.Send($message)
-    Write-Log "Alert email sent successfully."
+    Write-MonitorLog "Alert email sent successfully."
 } catch {
-    Write-Log "Failed to send alert email: $_" -Level ERROR
+    Write-MonitorLog "Failed to send alert email: $_" -Level ERROR
     exit 1
 }

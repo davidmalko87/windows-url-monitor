@@ -52,6 +52,9 @@
     Schedule this script with Windows Task Scheduler to run at regular intervals.
 #>
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSAvoidUsingPlainTextForPassword', 'SenderPassword',
+    Justification = 'Password is sourced from the MONITOR_SENDER_PASSWORD environment variable. No plain-text credential is ever hardcoded in source.')]
 [CmdletBinding()]
 param (
     [string]$Url            = $env:MONITOR_URL,
@@ -67,18 +70,18 @@ param (
 # Helpers
 # ---------------------------------------------------------------------------
 
-function Write-Log {
+function Write-MonitorLog {
     param([string]$Message, [ValidateSet('INFO','WARN','ERROR')][string]$Level = 'INFO')
     $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
     $line = "[$timestamp] [$Level] $Message"
     Write-Output $line
-    Add-Content -Path $LogFile -Value $line
+    Add-Content -Path $script:LogFile -Value $line
 }
 
 function Assert-Required {
     param([string]$Value, [string]$Name)
     if (-not $Value) {
-        Write-Log "Required parameter '$Name' is not set. Set the corresponding environment variable or pass it as a parameter." -Level ERROR
+        Write-MonitorLog "Required parameter '$Name' is not set. Set the corresponding environment variable or pass it as a parameter." -Level ERROR
         exit 1
     }
 }
@@ -95,19 +98,19 @@ Assert-Required $RecipientEmail 'RecipientEmail (MONITOR_RECIPIENT_EMAIL)'
 # Check connectivity
 # ---------------------------------------------------------------------------
 
-Write-Log "Checking connectivity to '$Url'..."
+Write-MonitorLog "Checking connectivity to '$Url'..."
 
 $isReachable = $false
 try {
     $result = Test-NetConnection -ComputerName $Url -InformationLevel Quiet -ErrorAction Stop
     $isReachable = [bool]$result
 } catch {
-    Write-Log "Test-NetConnection threw an exception: $_" -Level WARN
+    Write-MonitorLog "Test-NetConnection threw an exception: $_" -Level WARN
     $isReachable = $false
 }
 
 if ($isReachable) {
-    Write-Log "'$Url' is accessible. No action needed."
+    Write-MonitorLog "'$Url' is accessible. No action needed."
     exit 0
 }
 
@@ -115,7 +118,7 @@ if ($isReachable) {
 # Site is down — send alert email
 # ---------------------------------------------------------------------------
 
-Write-Log "'$Url' is NOT accessible. Sending alert email to '$RecipientEmail'..." -Level WARN
+Write-MonitorLog "'$Url' is NOT accessible. Sending alert email to '$RecipientEmail'..." -Level WARN
 
 $subject = "ALERT: $Url is unreachable"
 $body    = @"
@@ -129,20 +132,20 @@ Please investigate as soon as possible.
 "@
 
 try {
-    $message         = New-Object System.Net.Mail.MailMessage $SenderEmail, $RecipientEmail
+    $message         = New-Object -TypeName System.Net.Mail.MailMessage -ArgumentList $SenderEmail, $RecipientEmail
     $message.Subject = $subject
     $message.Body    = $body
 
-    $smtp            = New-Object System.Net.Mail.SmtpClient $SmtpServer, $SmtpPort
+    $smtp            = New-Object -TypeName System.Net.Mail.SmtpClient -ArgumentList $SmtpServer, $SmtpPort
     $smtp.EnableSsl  = ($SmtpPort -ne 25)   # enable TLS for non-legacy ports
 
     if ($SenderPassword) {
-        $smtp.Credentials = New-Object System.Net.NetworkCredential $SenderEmail, $SenderPassword
+        $smtp.Credentials = New-Object -TypeName System.Net.NetworkCredential -ArgumentList $SenderEmail, $SenderPassword
     }
 
     $smtp.Send($message)
-    Write-Log "Alert email sent successfully."
+    Write-MonitorLog "Alert email sent successfully."
 } catch {
-    Write-Log "Failed to send alert email: $_" -Level ERROR
+    Write-MonitorLog "Failed to send alert email: $_" -Level ERROR
     exit 1
 }

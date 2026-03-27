@@ -55,6 +55,9 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
     'PSAvoidUsingPlainTextForPassword', 'SenderPassword',
     Justification = 'Password is sourced from the MONITOR_SENDER_PASSWORD environment variable. No plain-text credential is ever hardcoded in source.')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSReviewUnusedParameter', 'LogFile',
+    Justification = 'LogFile is consumed inside Write-MonitorLog via $script:LogFile. PSScriptAnalyzer does not track variable usage across nested function scopes.')]
 [CmdletBinding()]
 param (
     [string]$Url            = $env:MONITOR_URL,

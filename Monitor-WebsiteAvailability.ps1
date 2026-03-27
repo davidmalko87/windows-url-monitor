@@ -52,6 +52,9 @@
     Schedule this script with Windows Task Scheduler to run at regular intervals.
 #>
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSAvoidUsingPlainTextForPassword', 'SenderPassword',
+    Justification = 'Password is sourced from the MONITOR_SENDER_PASSWORD environment variable. No plain-text credential is ever hardcoded in source.')]
 [CmdletBinding()]
 param (
     [string]$Url            = $env:MONITOR_URL,
@@ -129,15 +132,15 @@ Please investigate as soon as possible.
 "@
 
 try {
-    $message         = New-Object System.Net.Mail.MailMessage $SenderEmail, $RecipientEmail
+    $message         = New-Object -TypeName System.Net.Mail.MailMessage -ArgumentList $SenderEmail, $RecipientEmail
     $message.Subject = $subject
     $message.Body    = $body
 
-    $smtp            = New-Object System.Net.Mail.SmtpClient $SmtpServer, $SmtpPort
+    $smtp            = New-Object -TypeName System.Net.Mail.SmtpClient -ArgumentList $SmtpServer, $SmtpPort
     $smtp.EnableSsl  = ($SmtpPort -ne 25)   # enable TLS for non-legacy ports
 
     if ($SenderPassword) {
-        $smtp.Credentials = New-Object System.Net.NetworkCredential $SenderEmail, $SenderPassword
+        $smtp.Credentials = New-Object -TypeName System.Net.NetworkCredential -ArgumentList $SenderEmail, $SenderPassword
     }
 
     $smtp.Send($message)

@@ -12,7 +12,7 @@
 
 ## Checklist
 
-- [ ] Tested locally — the script runs without errors
+- [ ] Tested locally - the script runs without errors
 - [ ] `Invoke-ScriptAnalyzer` reports no warnings or errors
 - [ ] Version bumped in `windows-url-monitor.psd1` (if behaviour changed)
 - [ ] `CHANGELOG.md` updated with a new entry (if behaviour changed)

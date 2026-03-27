@@ -11,7 +11,7 @@ body:
     id: version
     attributes:
       label: Script version
-      description: "Found in `windows-url-monitor.psd1` → `ModuleVersion`"
+      description: "Found in `windows-url-monitor.psd1` -> `ModuleVersion`"
       placeholder: "e.g. 1.1.1"
     validations:
       required: true
@@ -42,7 +42,7 @@ body:
       placeholder: |
         1. Set `$env:MONITOR_URL = "example.com"`
         2. Run `.\Monitor-WebsiteAvailability.ps1`
-        3. Observe…
+        3. Observe...
     validations:
       required: true
 

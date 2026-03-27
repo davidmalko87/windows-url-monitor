@@ -12,7 +12,7 @@ body:
     attributes:
       label: Problem it solves
       description: "What limitation or gap does this feature address?"
-      placeholder: "e.g. When the script detects a down site, it always sends an email even if the outage was only 1 second…"
+      placeholder: "e.g. When the script detects a down site, it always sends an email even if the outage was only 1 second..."
     validations:
       required: true
 
@@ -21,7 +21,7 @@ body:
     attributes:
       label: Proposed solution
       description: "Describe the behaviour you'd like to see"
-      placeholder: "e.g. Add a `-MinDowntimeSeconds` parameter so alerts are only sent after the site has been unreachable for N seconds…"
+      placeholder: "e.g. Add a `-MinDowntimeSeconds` parameter so alerts are only sent after the site has been unreachable for N seconds..."
     validations:
       required: true
 

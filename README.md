@@ -17,7 +17,7 @@
 Windows Task Scheduler can run scripts on a tight interval, but it has no built-in
 alerting when a site goes down. This script fills that gap: it wraps
 `Test-NetConnection` in a lightweight, credential-safe, self-logging loop that sends
-an SMTP email the instant your target stops responding — no extra tooling or services
+an SMTP email the instant your target stops responding - no extra tooling or services
 required.
 
 ---
@@ -28,7 +28,7 @@ required.
 |---|---|
 | TCP connectivity check | Uses `Test-NetConnection` to verify the target host is reachable |
 | Instant email alert | Sends an SMTP message the moment the site becomes unreachable |
-| Credential isolation | All secrets are read from environment variables — never hardcoded |
+| Credential isolation | All secrets are read from environment variables - never hardcoded |
 | Timestamped audit log | Every check is appended to `monitor.log` with `[INFO]`/`[WARN]`/`[ERROR]` severity |
 | TLS support | Enables SSL automatically for non-legacy SMTP ports (587 / 465) |
 | Descriptive exit codes | `0` on success, `1` on configuration or send failure |
@@ -82,10 +82,10 @@ Or pass parameters directly (useful for testing):
 
 ### 4. Schedule with Task Scheduler
 
-1. Open **Task Scheduler** → **Create Basic Task**
+1. Open **Task Scheduler** -> **Create Basic Task**
 2. Name it (e.g. `Website Availability Monitor`)
 3. Set the trigger interval (e.g. every 5 minutes)
-4. **Action → Program:** `powershell.exe`
+4. **Action -> Program:** `powershell.exe`
    **Arguments:** `-NonInteractive -ExecutionPolicy Bypass -File "C:\path\to\Monitor-WebsiteAvailability.ps1"`
 5. Run the task under the account whose environment variables are configured
 
@@ -95,10 +95,10 @@ Or pass parameters directly (useful for testing):
 
 | Variable | Required | Description | Default |
 |---|---|---|---|
-| `MONITOR_URL` | Yes | Hostname to monitor (e.g. `example.com`) | — |
-| `MONITOR_SENDER_EMAIL` | Yes | Email address that sends the alert | — |
-| `MONITOR_RECIPIENT_EMAIL` | Yes | Email address that receives the alert | — |
-| `MONITOR_SENDER_PASSWORD` | No | SMTP password for the sender account | — |
+| `MONITOR_URL` | Yes | Hostname to monitor (e.g. `example.com`) | - |
+| `MONITOR_SENDER_EMAIL` | Yes | Email address that sends the alert | - |
+| `MONITOR_RECIPIENT_EMAIL` | Yes | Email address that receives the alert | - |
+| `MONITOR_SENDER_PASSWORD` | No | SMTP password for the sender account | - |
 | `MONITOR_SMTP_SERVER` | No | SMTP server hostname | `localhost` |
 | `MONITOR_SMTP_PORT` | No | SMTP server port | `587` |
 
@@ -133,7 +133,8 @@ Each run appends a line to `monitor.log` in the script directory:
 ```
 windows-url-monitor/
 ├── Monitor-WebsiteAvailability.ps1  # Main monitoring script
-├── windows-url-monitor.psd1         # Manifest — canonical version source
+├── windows-url-monitor.psd1         # Manifest - canonical version source
+├── PSScriptAnalyzerSettings.psd1    # Linter configuration
 ├── CHANGELOG.md                     # Version history
 ├── CONTRIBUTING.md                  # Contribution guide and semver policy
 ├── LICENSE                          # MIT licence
@@ -144,15 +145,15 @@ windows-url-monitor/
 
 ## Known limitations
 
-- Uses `Test-NetConnection` (TCP reachability), not HTTP — a server returning `500` or a redirect loop will still appear "up"
-- No retry logic — a single transient packet loss triggers an alert immediately
+- Uses `Test-NetConnection` (TCP reachability), not HTTP - a server returning `500` or a redirect loop will still appear "up"
+- No retry logic - a single transient packet loss triggers an alert immediately
 - Monitors one endpoint per script instance; for multiple URLs, schedule one instance per target
 
 ---
 
 ## Security notes
 
-- Never commit credentials to version control — always use environment variables
+- Never commit credentials to version control - always use environment variables
 - Use port 587 with TLS for public SMTP services
 - Prefer app-specific passwords over your main account password where supported
 

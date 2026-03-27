@@ -115,7 +115,7 @@ if ($isReachable) {
 }
 
 # ---------------------------------------------------------------------------
-# Site is down — send alert email
+# Site is down - send alert email
 # ---------------------------------------------------------------------------
 
 Write-MonitorLog "'$Url' is NOT accessible. Sending alert email to '$RecipientEmail'..." -Level WARN

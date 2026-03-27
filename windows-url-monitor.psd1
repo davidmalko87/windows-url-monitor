@@ -1,4 +1,4 @@
-# Script manifest — single source of truth for version and metadata.
+# Script manifest - single source of truth for version and metadata.
 # Read with: Import-PowerShellDataFile .\windows-url-monitor.psd1
 @{
     ModuleVersion     = '1.1.1'
